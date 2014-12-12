@@ -3,7 +3,7 @@ wak-module
 
 Common repository for [Wakanda](http://www.wakanda.org) module development.
 
-Building a module
+Building a shared library
 -----------------
 
 **Ubuntu**
@@ -74,4 +74,60 @@ Do the same for all libraries.
 
 ```sh
 install_name_tool -change {library_path} @loader_path/{library_name} path
+```
+
+**Windows**
+
+You have the option of using Visual C, MinGW or Cygwin. My first preference is MinGW.
+
+Some scripts fail to find dependencies.
+
+```sh
+export LDFLAGS="-L/usr/local/lib"
+export CPPFLAGS="-I/usr/local/include"
+```
+
+Some "configure" scripts wrongly assume a 32 bit platform. To make sure you build 64 bits, pass some options.
+
+```sh
+./configure --disable-static --enable-shared --host=x86_64-w64-mingw32
+```
+If successful, the shared library (DLL) should be installed under /usr/local/lib in the MinGW directory.
+
+Sometimes, you may have the DLL, perhaps created using a different (CMake, Visual C, Cygwin, etc) build system.
+
+If that is the case, consider creating a placeholder library (small size LIB) using DUMPBIN and LIB.
+
+For example:
+
+```sh
+dumpbin /exports zlib1.dll /out:zlib1.def
+```
+
+Use that DEF file to create a list of entry points for the DLL.
+
+In 4D code:
+```
+$src:=Get text from pasteboard
+
+ARRAY LONGINT($pos;0)
+ARRAY LONGINT($len;0)
+
+$i:=1
+
+$dst:=""
+
+While (Match regex("\\s+\\d+\\s+[0-9A-F]+\\s+[0-9A-F]+\\s+(\\S+)";$src;$i;$pos;$len))
+$dst:=$dst+Substring($src;$pos{1};$len{1})+"\r\n"
+$i:=$pos{1}+$len{1}
+End while 
+
+SET TEXT TO PASTEBOARD($dst)
+```
+
+Feed that DEF to LIB.
+
+```sh
+lib /def::zlib1.def /out::zlib1.lib /machine:x86
+lib /def::zlib1.def /out::zlib1.lib /machine:x64
 ```
