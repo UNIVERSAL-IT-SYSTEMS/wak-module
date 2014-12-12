@@ -118,8 +118,8 @@ $i:=1
 $dst:=""
 
 While (Match regex("\\s+\\d+\\s+[0-9A-F]+\\s+[0-9A-F]+\\s+(\\S+)";$src;$i;$pos;$len))
-$dst:=$dst+Substring($src;$pos{1};$len{1})+"\r\n"
-$i:=$pos{1}+$len{1}
+  $dst:=$dst+Substring($src;$pos{1};$len{1})+"\r\n"
+  $i:=$pos{1}+$len{1}
 End while 
 
 SET TEXT TO PASTEBOARD($dst)
