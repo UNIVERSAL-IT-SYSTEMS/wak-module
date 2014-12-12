@@ -3,8 +3,8 @@ wak-module
 
 Common repository for [Wakanda](http://www.wakanda.org) module development.
 
-Building a mode
------
+Building a module
+-----------------
 
 **Ubuntu**
 
